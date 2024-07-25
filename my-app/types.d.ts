@@ -1,4 +1,4 @@
-type Product ={
+ type Product ={
     "id":string,
     "title":string,
     "price":number,
@@ -7,7 +7,7 @@ type Product ={
     "image":string,
     "rating":Rating
 }
-type Rating ={
+ type Rating ={
     "rate":number,
     "count":number,
 }

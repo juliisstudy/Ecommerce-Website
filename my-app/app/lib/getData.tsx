@@ -1,5 +1,5 @@
 import React from "react";
-
+const ItemPerPage = 9;
 export async function getProductsList() {
   const res = await fetch("https://fakestoreapi.com/products");
   if (!res.ok) throw new Error("failed to fetch data");
@@ -12,13 +12,10 @@ export async function getProduct(productId: number) {
   return res.json();
 }
 
-export async function productsFilter(search: string) {
-  const prductFilter: Promise<Product[]> = getProductsList();
-  const productList = await prductFilter;
-  productList.filter((product) => {
-    return (
-      (search && product && product.title.toLowerCase().includes(search)) ||
-      product.category.includes(search)
-    );
-  });
+export async function fetchPages(query: string) {
+  const productsList: Promise<Product[]> = getProductsList();
+  let products = await productsList;
+
+  const totalPage = Math.ceil(products.length / ItemPerPage);
+  return totalPage;
 }
