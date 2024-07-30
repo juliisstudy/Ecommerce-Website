@@ -18,6 +18,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
         params.delete(name);
       }
       replace(`${pathname}?${params.toString()}`);
+      console.log(params);
     },
     300
   );
@@ -28,13 +29,13 @@ export default function Search({ placeholder }: { placeholder: string }) {
         Search
       </label>
       <input
-        className="p-4 py-6"
+        className="p-4 py-6 border border-blue-200"
         placeholder={placeholder}
         data-lpignore="true"
         onChange={(e) => {
           createQueryString("filter", e.target.value);
         }}
-        defaultValue={searchParams.get("query")?.toString()}
+        defaultValue={searchParams.get("filter")?.toString()}
       />
     </div>
   );

@@ -1,8 +1,9 @@
-import React from "react";
-import { getProductsList } from "../lib/getData";
+import React, { ReactNode } from "react";
+import { getProductsList, fetchPages, fetchCategory } from "../lib/getData";
 import Link from "next/link";
 import { Metadata } from "next";
-// import ProductList from "@/app/component/ProductList";
+import Pagination from "@/app/component/Pagination";
+import Filter from "../component/Filter";
 export const metadata: Metadata = {
   title: "products",
 };
@@ -10,11 +11,12 @@ export const metadata: Metadata = {
 export default async function page({
   searchParams,
 }: {
-  searchParams?: { filter: string };
+  searchParams?: { filter?: string; page?: string };
 }) {
   const productsList: Promise<Product[]> = getProductsList();
   let products = await productsList;
 
+  const currentPage = Number(searchParams?.page) || 1;
   products = products.filter((product) => {
     if (searchParams?.filter) {
       return (
@@ -29,15 +31,33 @@ export default async function page({
     }
     return true;
   });
-
-  console.log(products.length);
+  const totalPage = fetchPages(products);
+  //const list = getCurrentProducts(currentPage, products);
 
   return (
     <div className="mx-20">
-      <ItemList products={products} />
+      <Filter data={products} />
+      {/* <ItemList products={list} /> */}
+      <div className="">
+        <Pagination totalPage={totalPage} />
+      </div>
     </div>
   );
 }
+
+const ProductTabFilter = (category: string, products: Product[]) => {
+  const list = products.filter((product) => {
+    product.category === category;
+  });
+  return list;
+};
+
+const ItemPerPage = 8;
+const getCurrentProducts = (currentPage: number, products: Product[]) => {
+  const offset = (currentPage - 1) * ItemPerPage;
+  const list = products.slice(offset, offset + ItemPerPage);
+  return list;
+};
 
 const ItemList = ({ products }: { products: Product[] }) => {
   return (
