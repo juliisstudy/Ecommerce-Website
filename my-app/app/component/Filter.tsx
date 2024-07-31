@@ -1,13 +1,18 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-export default function Filter({ data }: { data: Product[] }) {
-  const ranges = ["0-49", "50-99", "100-149"];
 
+export default function Filter({ data }: { data: Product[] }) {
   const [products, setProducts] = useState<Product[]>(data);
   const [selectedCategories, setSelectedCategories] = useState<any>([]);
   const [selectedRanges, setSelectedRanges] = useState<any>([]);
   const [dataPresent, setDataPresent] = useState<boolean>(false);
+  const [dropdownSelected, setdropdownSelected] = useState<string>("");
+
+  const options = [
+    { value: "priceMin-Max", lable: "priceMin-Max" },
+    { value: "priceMax-Min", lable: "priceMax-Min" },
+  ];
 
   const getUniqueCatg = (data: Product[], field: string) => {
     let newElement = data.map((curElement: any) => {
@@ -15,8 +20,22 @@ export default function Filter({ data }: { data: Product[] }) {
     });
     return (newElement = [...new Set(newElement)]);
   };
+
   const categoryType = getUniqueCatg(data, "category");
-  // const price = getUniqueCatg(data, "price");
+
+  const generateRange = (min: number, max: number, interval: number) => {
+    let i = min;
+    let ranges = [];
+    while (i < max) {
+      let rangString = `${i}-`;
+      i += interval;
+      rangString += `${i - 1}`;
+      ranges.push(rangString);
+    }
+    return ranges;
+  };
+
+  const ranges = generateRange(0, 500, 50);
 
   const handelCategorychange = (event: any) => {
     const category = event.target.value;
@@ -37,16 +56,55 @@ export default function Filter({ data }: { data: Product[] }) {
     if (event.target.checked) {
       setSelectedRanges([...selectedRanges, range]);
     } else {
-      setSelectedRanges(selectedRanges.filter((rang: any) => range !== range));
+      setSelectedRanges(selectedRanges.filter((r: any) => r !== range));
     }
   };
   console.log(selectedRanges);
 
+  function handleDropdown(event: any) {
+    setdropdownSelected(event.target.value);
+  }
+
+  const generateRangeArray = (min: number, max: number, interval: number) => {
+    let i = min;
+    let ranges = [];
+    while (i < max) {
+      let range = [];
+      range.push(i);
+      i += interval;
+      range.push(i - 1);
+      ranges.push(range);
+    }
+    return ranges;
+  };
+
+  const rangesNumber = generateRangeArray(0, 500, 50);
+
+  const checkIfInRange = (price: number) => {
+    let range = "";
+    rangesNumber.forEach((ranges) => {
+      if (price >= ranges[0] && price < ranges[1]) {
+        range = ranges.join("-");
+      }
+    });
+    return range;
+  };
+
   useEffect(() => {
+    if (dropdownSelected === "priceMin-Max") {
+      setProducts(data.sort((a, b) => Number(a.price) - Number(b.price)));
+    }
+    if (dropdownSelected === "priceMax-Min") {
+      setProducts(data.sort((a, b) => Number(b.price) - Number(a.price)));
+    }
+
     const groupedData = data.reduce((acc: any, item: any) => {
       const category = item.category;
-      const range = item.range;
-      console.log(range);
+      const price = item.price;
+      const range = checkIfInRange(price);
+      const propName = "range";
+      item[propName] = range;
+
       if (!acc[category]) {
         acc[category] = {};
       }
@@ -54,12 +112,12 @@ export default function Filter({ data }: { data: Product[] }) {
         acc[category][range] = [];
       }
       acc[category][range].push(item);
-      console.log(acc);
       return acc;
     }, {});
-    console.log(groupedData);
+
     if (selectedCategories.length === 0 && selectedRanges.length === 0) {
       setProducts(data);
+      console.log("data", data);
     } else if (selectedCategories.length > 0) {
       const filteredData = selectedCategories.flatMap((category: any) => {
         if (groupedData[category]) {
@@ -105,11 +163,25 @@ export default function Filter({ data }: { data: Product[] }) {
         setDataPresent(false);
       }
     }
-  }, [selectedCategories, selectedRanges]);
+  }, [selectedCategories, selectedRanges, dropdownSelected]);
 
   return (
     <div>
       {dataPresent && <div className="">no product is present</div>}
+
+      {/* dropdown */}
+
+      <select value={dropdownSelected} onChange={handleDropdown}>
+        {options.map((option) => {
+          return (
+            <option key={option.value} value={option.value}>
+              {option.lable}
+            </option>
+          );
+        })}
+      </select>
+
+      {/* checkbox */}
       <ul>
         {categoryType.map((item, idx) => (
           <li key={idx}>
@@ -158,6 +230,10 @@ const ItemList = ({ products }: { products: Product[] }) => {
 };
 
 const Item = ({ product }: { product: Product }) => {
+  function addtoCart(event: any) {
+    console.log("'addtocart");
+  }
+
   return (
     <div className="border border-blue-50">
       <Link href={`/products/${product.id}`}>
@@ -168,6 +244,7 @@ const Item = ({ product }: { product: Product }) => {
         <div>{product.rating.rate}</div>
         <div>{product.rating.count}</div>
       </Link>
+      <button onClick={addtoCart}>+</button>
     </div>
   );
 };
