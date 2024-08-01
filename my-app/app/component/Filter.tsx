@@ -9,10 +9,16 @@ export default function Filter({ data }: { data: Product[] }) {
   const [dataPresent, setDataPresent] = useState<boolean>(false);
   const [dropdownSelected, setdropdownSelected] = useState<string>("");
 
+  const [cart, setShopCart] = useState<Product[]>([]);
+
   const options = [
+    { value: "", lable: "select sorting method" },
+
     { value: "priceMin-Max", lable: "priceMin-Max" },
     { value: "priceMax-Min", lable: "priceMax-Min" },
   ];
+
+  //   const cartObjects = [];
 
   const getUniqueCatg = (data: Product[], field: string) => {
     let newElement = data.map((curElement: any) => {
@@ -62,7 +68,17 @@ export default function Filter({ data }: { data: Product[] }) {
   console.log(selectedRanges);
 
   function handleDropdown(event: any) {
-    setdropdownSelected(event.target.value);
+    const selectValue = event.target.value;
+    setdropdownSelected(selectValue);
+    const temp = data;
+    if (selectValue === "priceMin-Max") {
+      temp.sort((a, b) => Number(a.price) - Number(b.price));
+      console.log("data ", data[0]);
+    }
+    if (selectValue === "priceMax-Min") {
+      temp.sort((a, b) => Number(b.price) - Number(a.price));
+    }
+    setProducts(temp);
   }
 
   const generateRangeArray = (min: number, max: number, interval: number) => {
@@ -91,13 +107,6 @@ export default function Filter({ data }: { data: Product[] }) {
   };
 
   useEffect(() => {
-    if (dropdownSelected === "priceMin-Max") {
-      setProducts(data.sort((a, b) => Number(a.price) - Number(b.price)));
-    }
-    if (dropdownSelected === "priceMax-Min") {
-      setProducts(data.sort((a, b) => Number(b.price) - Number(a.price)));
-    }
-
     const groupedData = data.reduce((acc: any, item: any) => {
       const category = item.category;
       const price = item.price;
@@ -117,7 +126,6 @@ export default function Filter({ data }: { data: Product[] }) {
 
     if (selectedCategories.length === 0 && selectedRanges.length === 0) {
       setProducts(data);
-      console.log("data", data);
     } else if (selectedCategories.length > 0) {
       const filteredData = selectedCategories.flatMap((category: any) => {
         if (groupedData[category]) {
@@ -141,6 +149,16 @@ export default function Filter({ data }: { data: Product[] }) {
           return [];
         }
       });
+      if (dropdownSelected === "priceMin-Max") {
+        filteredData.sort(
+          (a: any, b: any) => Number(a.price) - Number(b.price)
+        );
+      }
+      if (dropdownSelected === "priceMax-Min") {
+        filteredData.sort(
+          (a: any, b: any) => Number(b.price) - Number(a.price)
+        );
+      }
       if (filteredData.length === 0) {
         setProducts([]);
         setDataPresent(true);
@@ -171,7 +189,11 @@ export default function Filter({ data }: { data: Product[] }) {
 
       {/* dropdown */}
 
-      <select value={dropdownSelected} onChange={handleDropdown}>
+      <select
+        value={dropdownSelected}
+        onChange={handleDropdown}
+        defaultValue={""}
+      >
         {options.map((option) => {
           return (
             <option key={option.value} value={option.value}>
