@@ -1,24 +1,22 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useDispatch } from "react-redux";
+import { hideLoading } from "@/redux/slices/cartSlice";
 
 export default function Filter({ data }: { data: Product[] }) {
+  const dispatch = useDispatch();
   const [products, setProducts] = useState<Product[]>(data);
   const [selectedCategories, setSelectedCategories] = useState<any>([]);
   const [selectedRanges, setSelectedRanges] = useState<any>([]);
   const [dataPresent, setDataPresent] = useState<boolean>(false);
   const [dropdownSelected, setdropdownSelected] = useState<string>("");
 
-  const [cart, setShopCart] = useState<Product[]>([]);
-
   const options = [
     { value: "", lable: "select sorting method" },
-
     { value: "priceMin-Max", lable: "priceMin-Max" },
     { value: "priceMax-Min", lable: "priceMax-Min" },
   ];
-
-  //   const cartObjects = [];
 
   const getUniqueCatg = (data: Product[], field: string) => {
     let newElement = data.map((curElement: any) => {
@@ -81,6 +79,20 @@ export default function Filter({ data }: { data: Product[] }) {
     setProducts(temp);
   }
 
+  const sortdata = (data: Product[]) => {
+    let sorteddata;
+    if (dropdownSelected === "priceMin-Max") {
+      sorteddata = data.sort(
+        (a: any, b: any) => Number(a.price) - Number(b.price)
+      );
+    }
+    if (dropdownSelected === "priceMax-Min") {
+      sorteddata = data.sort(
+        (a: any, b: any) => Number(b.price) - Number(a.price)
+      );
+    }
+    return sorteddata;
+  };
   const generateRangeArray = (min: number, max: number, interval: number) => {
     let i = min;
     let ranges = [];
@@ -107,6 +119,8 @@ export default function Filter({ data }: { data: Product[] }) {
   };
 
   useEffect(() => {
+    dispatch(hideLoading());
+
     const groupedData = data.reduce((acc: any, item: any) => {
       const category = item.category;
       const price = item.price;
@@ -125,6 +139,8 @@ export default function Filter({ data }: { data: Product[] }) {
     }, {});
 
     if (selectedCategories.length === 0 && selectedRanges.length === 0) {
+      sortdata(data);
+
       setProducts(data);
     } else if (selectedCategories.length > 0) {
       const filteredData = selectedCategories.flatMap((category: any) => {
@@ -143,26 +159,19 @@ export default function Filter({ data }: { data: Product[] }) {
           } else {
             return Object.values(groupedData[category])
               .flat()
-              .map((item: any) => ({ ...item, range: item.range }));
+              .map((item: any) => ({ ...item, range: item.range })); //
           }
         } else {
           return [];
         }
       });
-      if (dropdownSelected === "priceMin-Max") {
-        filteredData.sort(
-          (a: any, b: any) => Number(a.price) - Number(b.price)
-        );
-      }
-      if (dropdownSelected === "priceMax-Min") {
-        filteredData.sort(
-          (a: any, b: any) => Number(b.price) - Number(a.price)
-        );
-      }
+      //change pro
       if (filteredData.length === 0) {
         setProducts([]);
         setDataPresent(true);
       } else {
+        sortdata(filteredData);
+
         setProducts(filteredData);
         setDataPresent(false);
       }
@@ -177,11 +186,13 @@ export default function Filter({ data }: { data: Product[] }) {
         setProducts([]);
         setDataPresent(true);
       } else {
+        sortdata(filteredData);
+
         setProducts(filteredData);
         setDataPresent(false);
       }
     }
-  }, [selectedCategories, selectedRanges, dropdownSelected]);
+  }, [selectedCategories, selectedRanges, dropdownSelected, dispatch]);
 
   return (
     <div>
