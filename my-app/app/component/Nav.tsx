@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Search from "./Search";
 import { useSelector } from "react-redux";
@@ -10,7 +11,11 @@ export default function Nav() {
     <div>
       <div>Logo</div>
       <Search placeholder="Search players..." />
-      <div>category</div>
+      <div>
+        {loading
+          ? ""
+          : cartItems.reduce((a: number, c: Product) => a + c.qty, 0)}
+      </div>
     </div>
   );
 }

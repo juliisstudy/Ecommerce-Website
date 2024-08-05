@@ -1,11 +1,13 @@
  type Product ={
-    "id":string,
+    "id":number,
     "title":string,
-    "price":string,
+    "price":number,
     "description":string,
     "category":string,
     "image":string,
-    "rating":Rating
+    "rating":Rating,
+    "qty":number,
+    "countInstock":number
 }
  type Rating ={
     "rate":number,

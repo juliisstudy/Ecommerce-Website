@@ -26,7 +26,7 @@ export default async function page({
         product.category
           .toLowerCase()
           .includes(searchParams.filter.toLowerCase()) ||
-        product.price === searchParams.filter
+        product.price === Number(searchParams.filter)
       );
     }
     return true;

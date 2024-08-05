@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { hideLoading } from "@/redux/slices/cartSlice";
+import AddToCart from "./AddToCart";
 
 export default function Filter({ data }: { data: Product[] }) {
   const dispatch = useDispatch();
@@ -119,7 +120,7 @@ export default function Filter({ data }: { data: Product[] }) {
   };
 
   useEffect(() => {
-    dispatch(hideLoading());
+    dispatch(hideLoading()), [dispatch];
 
     const groupedData = data.reduce((acc: any, item: any) => {
       const category = item.category;
@@ -127,6 +128,8 @@ export default function Filter({ data }: { data: Product[] }) {
       const range = checkIfInRange(price);
       const propName = "range";
       item[propName] = range;
+      const propNameStock = "countInstock";
+      item[propNameStock] = 10;
 
       if (!acc[category]) {
         acc[category] = {};
@@ -277,7 +280,12 @@ const Item = ({ product }: { product: Product }) => {
         <div>{product.rating.rate}</div>
         <div>{product.rating.count}</div>
       </Link>
-      <button onClick={addtoCart}>+</button>
+      <AddToCart
+        showQty={false}
+        product={product}
+        increasePerClick={true}
+        redirect={false}
+      />
     </div>
   );
 };

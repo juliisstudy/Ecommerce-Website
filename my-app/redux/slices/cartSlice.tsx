@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { cookies } from "next/headers";
+//import { cookies } from "next/headers";
 export interface Product {
-  id: string;
+  id: number;
   title: string;
   price: number;
   image: string;
   qty: number;
+  countInstock: number;
 }
 export interface ProductState {
   loading: boolean;
@@ -59,7 +60,7 @@ const cartSlice = createSlice({
       state.totalPrice = addDecimals(
         state.taxPrice + state.itemsPrice + state.taxPrice
       );
-      cookies().set("cart", JSON.stringify(state));
+      // cookies().set("cart", JSON.stringify(state));
     },
     removeFromCart: (state, action) => {
       state.cartItems = state.cartItems.filter((x) => x.id !== action.payload);
@@ -78,7 +79,7 @@ const cartSlice = createSlice({
       state.totalPrice = addDecimals(
         state.taxPrice + state.itemsPrice + state.taxPrice
       );
-      cookies().set("cart", JSON.stringify(state));
+      //cookies().set("cart", JSON.stringify(state));
     },
     hideLoading: (state) => {
       state.loading = false;
