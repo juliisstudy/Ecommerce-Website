@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-//import { cookies } from "next/headers";
+import Cookies from "js-cookie";
 export interface Product {
   id: number;
   title: string;
@@ -16,6 +16,8 @@ export interface ProductState {
   taxRate: number;
   taxPrice: number;
   totalPrice: number;
+  shippingAddress: Object;
+  paymentMethod: string;
 }
 const initialState: ProductState = {
   loading: true,
@@ -25,6 +27,8 @@ const initialState: ProductState = {
   taxRate: 0.07,
   taxPrice: 0,
   totalPrice: 0,
+  shippingAddress: {},
+  paymentMethod: "",
 };
 
 const addDecimals = (num: number) => {
@@ -60,7 +64,7 @@ const cartSlice = createSlice({
       state.totalPrice = addDecimals(
         state.taxPrice + state.itemsPrice + state.taxPrice
       );
-      // cookies().set("cart", JSON.stringify(state));
+      Cookies.set("cart", JSON.stringify(state));
     },
     removeFromCart: (state, action) => {
       state.cartItems = state.cartItems.filter((x) => x.id !== action.payload);
@@ -79,12 +83,27 @@ const cartSlice = createSlice({
       state.totalPrice = addDecimals(
         state.taxPrice + state.itemsPrice + state.taxPrice
       );
-      //cookies().set("cart", JSON.stringify(state));
+      Cookies.set("cart", JSON.stringify(state));
+    },
+
+    saveShippingAddress: (state, action) => {
+      state.shippingAddress = action.payload;
+      Cookies.set("cart", JSON.stringify(state));
+    },
+    savePaymentMethod: (state, action) => {
+      state.paymentMethod = action.payload;
+      Cookies.set("cart", JSON.stringify(state));
     },
     hideLoading: (state) => {
       state.loading = false;
     },
   },
 });
-export const { addToCart, removeFromCart, hideLoading } = cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  hideLoading,
+  saveShippingAddress,
+  savePaymentMethod,
+} = cartSlice.actions;
 export default cartSlice.reducer;

@@ -30,7 +30,7 @@ export default function CartSidebar() {
               Go to cart
             </Link>
           </div>
-          {cartItems.map((item: Product) => {
+          {cartItems.map((item: Product) => (
             <div key={item.id} className="p-2 flex flex-col items-center">
               <Link href={`/product/${item.id}`} className="flex items-center">
                 {item.id}
@@ -51,8 +51,8 @@ export default function CartSidebar() {
               >
                 Delete
               </button>
-            </div>;
-          })}
+            </div>
+          ))}
         </div>
       )}
     </div>

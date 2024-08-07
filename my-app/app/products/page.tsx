@@ -31,16 +31,13 @@ export default async function page({
     }
     return true;
   });
-  const totalPage = fetchPages(products);
+  // const totalPage = fetchPages(products);
   //const list = getCurrentProducts(currentPage, products);
 
   return (
     <div className="mx-20">
       <Filter data={products} />
-      {/* <ItemList products={list} /> */}
-      <div className="">
-        <Pagination totalPage={totalPage} />
-      </div>
+      <div className="">{/* <Pagination totalPage={} /> */}</div>
     </div>
   );
 }

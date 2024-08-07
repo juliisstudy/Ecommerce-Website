@@ -22,7 +22,7 @@ export default function AddToCart({
   const router = useRouter();
   const [qty, setQty] = useState(1);
 
-  const addToCartHandler = () => {
+  const addToCartHandler = async () => {
     let newQty = qty;
     if (increasePerClick) {
       const existItem = cartItems.find((x: Product) => x.id === product.id);

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { hideLoading } from "@/redux/slices/cartSlice";
 import AddToCart from "./AddToCart";
+import Pagination from "./Pagination";
+import { fetchPages } from "../lib/getData";
 
 export default function Filter({ data }: { data: Product[] }) {
   const dispatch = useDispatch();
@@ -118,6 +120,7 @@ export default function Filter({ data }: { data: Product[] }) {
     });
     return range;
   };
+  const totalPage = fetchPages(products);
 
   useEffect(() => {
     dispatch(hideLoading()), [dispatch];
@@ -251,6 +254,7 @@ export default function Filter({ data }: { data: Product[] }) {
       <div>
         <ItemList products={products} />
       </div>
+      <Pagination totalPage={totalPage} />
     </div>
   );
 }
@@ -266,10 +270,6 @@ const ItemList = ({ products }: { products: Product[] }) => {
 };
 
 const Item = ({ product }: { product: Product }) => {
-  function addtoCart(event: any) {
-    console.log("'addtocart");
-  }
-
   return (
     <div className="border border-blue-50">
       <Link href={`/products/${product.id}`}>
