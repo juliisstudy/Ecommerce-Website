@@ -4,6 +4,7 @@ import "./globals.css";
 import Nav from "./component/Nav";
 import { StoreProvider } from "@/redux/StoreProvider";
 import App from "./component/App";
+import Footer from "@/app/component/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function RootLayout({
           <Nav />
 
           <App>{children}</App>
-          <div>footer</div>
+          <Footer />
         </StoreProvider>
       </body>
     </html>

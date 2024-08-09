@@ -4,8 +4,15 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { hideLoading } from "@/redux/slices/cartSlice";
 import AddToCart from "./AddToCart";
-import Pagination from "./Pagination";
-import { fetchPages } from "../lib/getData";
+import PaginationComponent from "./Pagination";
+import Image from "next/image";
+import ProductRate from "@/app/component/ProductRate";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function Filter({ data }: { data: Product[] }) {
   const dispatch = useDispatch();
@@ -14,9 +21,11 @@ export default function Filter({ data }: { data: Product[] }) {
   const [selectedRanges, setSelectedRanges] = useState<any>([]);
   const [dataPresent, setDataPresent] = useState<boolean>(false);
   const [dropdownSelected, setdropdownSelected] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productPerPage] = useState(8);
 
   const options = [
-    { value: "", lable: "select sorting method" },
+    { value: "", lable: "Sort by" },
     { value: "priceMin-Max", lable: "priceMin-Max" },
     { value: "priceMax-Min", lable: "priceMax-Min" },
   ];
@@ -120,7 +129,18 @@ export default function Filter({ data }: { data: Product[] }) {
     });
     return range;
   };
-  const totalPage = fetchPages(products);
+
+  //pagination
+  const indexOfLastProduct = currentPage * productPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productPerPage;
+  const currentProduct = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  function paginate(pageNumber: number) {
+    setCurrentPage(pageNumber);
+  }
 
   useEffect(() => {
     dispatch(hideLoading()), [dispatch];
@@ -201,60 +221,85 @@ export default function Filter({ data }: { data: Product[] }) {
   }, [selectedCategories, selectedRanges, dropdownSelected, dispatch]);
 
   return (
-    <div>
+    <div className="  flex flex-row">
       {dataPresent && <div className="">no product is present</div>}
+      <div className="w-2/12  mt-10 mr-10">
+        {/* checkbox */}
 
-      {/* dropdown */}
+        {/* dropdown */}
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-2">
+            <AccordionTrigger>Category</AccordionTrigger>
+            <AccordionContent>
+              <ul>
+                {categoryType.map((item, idx) => (
+                  <li key={idx} className="flex flex-row gap-4 p-3 text-lg">
+                    <div>
+                      <input
+                        type="checkbox"
+                        value={item}
+                        checked={selectedCategories.includes(item)}
+                        onChange={handelCategorychange}
+                      />
+                    </div>
+                    <div>{item}</div>
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
 
-      <select
-        value={dropdownSelected}
-        onChange={handleDropdown}
-        defaultValue={""}
-      >
-        {options.map((option) => {
-          return (
-            <option key={option.value} value={option.value}>
-              {option.lable}
-            </option>
-          );
-        })}
-      </select>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>Price Range</AccordionTrigger>
+            <AccordionContent>
+              <ul>
+                {ranges.map((item, idx) => (
+                  <li key={idx} className="flex flex-row gap-4 p-3 text-lg">
+                    <div>
+                      <input
+                        type="checkbox"
+                        value={item}
+                        checked={selectedRanges.includes(item)}
+                        onChange={handleRangeChange}
+                      />
+                    </div>
+                    <div>{item}</div>
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
-      {/* checkbox */}
-      <ul>
-        {categoryType.map((item, idx) => (
-          <li key={idx}>
-            <div>
-              <input
-                type="checkbox"
-                value={item}
-                checked={selectedCategories.includes(item)}
-                onChange={handelCategorychange}
-              />
-            </div>
-            <div>{item}</div>
-          </li>
-        ))}
-      </ul>
-      <ul>
-        {ranges.map((item, idx) => (
-          <li key={idx}>
-            <div>
-              <input
-                type="checkbox"
-                value={item}
-                checked={selectedRanges.includes(item)}
-                onChange={handleRangeChange}
-              />
-            </div>
-            <div>{item}</div>
-          </li>
-        ))}
-      </ul>
-      <div>
-        <ItemList products={products} />
+        {/* checkbox */}
       </div>
-      <Pagination totalPage={totalPage} />
+      <div className="flex flex-col mr-20  w-10/12">
+        <div>
+          <select
+            className="float-right text-lg p-1 rounded-lg pl-3 bg-white border border-slate-200"
+            value={dropdownSelected}
+            onChange={handleDropdown}
+            defaultValue={""}
+          >
+            {options.map((option) => {
+              return (
+                <option key={option.value} value={option.value}>
+                  {option.lable}
+                </option>
+              );
+            })}
+          </select>
+          <div className="mt-10">
+            <ItemList products={currentProduct} />
+          </div>
+        </div>
+        <PaginationComponent
+          productsPerPage={productPerPage}
+          totalProducts={products.length}
+          paginate={paginate}
+          currentPage={currentPage}
+        />
+      </div>
     </div>
   );
 }
@@ -271,21 +316,38 @@ const ItemList = ({ products }: { products: Product[] }) => {
 
 const Item = ({ product }: { product: Product }) => {
   return (
-    <div className="border border-blue-50">
+    <div className="border border-blue-50 relative">
       <Link href={`/products/${product.id}`}>
-        <div>{product.image}</div>
-        <div>{product.title}</div>
-        <div>{product.price}</div>
-        <div>{product.category}</div>
-        <div>{product.rating.rate}</div>
-        <div>{product.rating.count}</div>
+        <div className=" h-56 mx-auto mb-2">
+          <Image
+            src={product.image}
+            width={200}
+            height={200}
+            alt={product.title}
+            className=" w-48 h-56 mx-auto"
+          />
+        </div>
+        <div className="ml-4 mt-6">
+          <div className="text-slate-700 text-base leading-relaxed mb-2">
+            {product.title}
+          </div>
+          <ProductRate
+            rate={product.rating.rate}
+            count={product.rating.count}
+          />
+          <div className="text-slate-700 text-base leading-relaxed py-4 font-bold">
+            ${product.price}
+          </div>
+        </div>
       </Link>
-      <AddToCart
-        showQty={false}
-        product={product}
-        increasePerClick={true}
-        redirect={false}
-      />
+      <div className="absolute bottom-3 right-4">
+        <AddToCart
+          showQty={false}
+          product={product}
+          increasePerClick={true}
+          redirect={false}
+        />
+      </div>
     </div>
   );
 };

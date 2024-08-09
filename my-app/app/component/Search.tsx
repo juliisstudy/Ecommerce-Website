@@ -11,7 +11,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
   const createQueryString = useDebouncedCallback(
     (name: string, term: string) => {
       const params = new URLSearchParams(searchParams);
-      params.set("page", "1");
+      // params.set("page", "1");
       if (term) {
         params.set(name, term);
       } else {
@@ -24,12 +24,12 @@ export default function Search({ placeholder }: { placeholder: string }) {
   );
 
   return (
-    <div className="relative flex flex-1 flex-shrink-0">
+    <div className="m-5">
       <label htmlFor="search" className="sr-only">
         Search
       </label>
       <input
-        className="p-4 py-6 border border-blue-200"
+        className=" border border-slate-200 h-10 w-full rounded-lg pl-5"
         placeholder={placeholder}
         data-lpignore="true"
         onChange={(e) => {

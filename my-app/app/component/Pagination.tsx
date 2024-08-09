@@ -5,55 +5,150 @@ import { generatePagination } from "../lib/utils";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import Link from "next/link";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
-export default function Pagination({ totalPage }: { totalPage: number }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentPage = Number(searchParams.get("page")) || 1;
+type Params = {
+  productsPerPage: number;
+  totalProducts: number;
+  paginate: Function;
+  currentPage: number;
+};
 
-  const createPageURL = (pageNumber: number | string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", pageNumber.toString());
-    console.log(params);
-    return `${pathname}?${params.toString()}`;
+export default function PaginationComponent({
+  productsPerPage,
+  totalProducts,
+  paginate,
+  currentPage,
+}: Params) {
+  const pageNumber = [
+    ...Array(Math.ceil(totalProducts / productsPerPage)).keys(),
+  ].map((i) => i + 1);
+
+  const prevPageHandler = () => {
+    if (currentPage !== 1) paginate(currentPage - 1);
   };
-
-  const allPages = generatePagination(currentPage, totalPage);
-
+  const nextPageHandler = () => {
+    if (currentPage !== pageNumber[pageNumber.length - 1])
+      paginate(currentPage + 1);
+  };
   return (
-    <div className="inline-flex">
-      {currentPage}
-      <PaginationArrow
-        direction="left"
-        href={createPageURL(currentPage - 1)}
-        isDisabled={currentPage <= 1}
-      />
-      <div className="flex -space-x-px">
-        {allPages.map((page, index) => {
-          let position: "first" | "last" | "single" | "middle" | undefined;
-          if (index === 0) position = "first";
-          if (index === allPages.length - 1) position = "last";
-          if (allPages.length === 1) position = "single";
-          if (page === "...") position = "middle";
-          return (
-            <PaginationNumber
-              key={page}
-              href={createPageURL(page)}
-              page={page}
-              position={position}
-              isActive={currentPage === page}
+    <div className="mt-10">
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={prevPageHandler}
+              className={`${currentPage !== 1 ? "active" : ""}`}
             />
-          );
-        })}
-      </div>
+          </PaginationItem>
 
-      <PaginationArrow
-        direction="right"
-        href={createPageURL(currentPage + 1)}
-        isDisabled={currentPage + 1 >= totalPage}
-      />
+          {pageNumber.map((number) => (
+            <PaginationItem key={number} className="">
+              <PaginationLink
+                href="#"
+                className={`${currentPage === number ? "active" : ""}`}
+                onClick={() => paginate(number)}
+              >
+                {number}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={nextPageHandler}
+              className={`${
+                currentPage !== pageNumber[pageNumber.length - 1]
+                  ? "active"
+                  : ""
+              }`}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+      {/* 
+      <nav className="flex flex-row">
+        <span>prev</span>
+        {pageNumber.map((number) => (
+          <span key={number} className="w-5 h-5 border border-red-500">
+            <a
+              href="#"
+              className={`${currentPage === number ? "active" : ""}`}
+              onClick={() => paginate(number)}
+            >
+              {number}
+            </a>
+          </span>
+        ))}
+        <span
+          onClick={nextPageHandler}
+          className={`${
+            currentPage !== pageNumber[pageNumber.length - 1] ? "active" : ""
+          }`}
+        >
+          prev
+        </span>
+      </nav> */}
     </div>
   );
+  // const pathname = usePathname();
+  // const searchParams = useSearchParams();
+
+  // const currentPage = Number(searchParams.get("page")) || 1;
+
+  // const createPageURL = (pageNumber: number | string) => {
+  //   const params = new URLSearchParams(searchParams);
+  //   params.set("page", pageNumber.toString());
+  //   console.log(params);
+  //   return `${pathname}?${params.toString()}`;
+  // };
+
+  // const allPages = generatePagination(currentPage, totalPage);
+
+  // return (
+  //   <div className="inline-flex">
+  //     {currentPage}
+  //     <PaginationArrow
+  //       direction="left"
+  //       href={createPageURL(currentPage - 1)}
+  //       isDisabled={currentPage <= 1}
+  //     />
+  //     <div className="flex -space-x-px">
+  //       {allPages.map((page, index) => {
+  //         let position: "first" | "last" | "single" | "middle" | undefined;
+  //         if (index === 0) position = "first";
+  //         if (index === allPages.length - 1) position = "last";
+  //         if (allPages.length === 1) position = "single";
+  //         if (page === "...") position = "middle";
+  //         return (
+  //           <PaginationNumber
+  //             key={page}
+  //             href={createPageURL(page)}
+  //             page={page}
+  //             position={position}
+  //             isActive={currentPage === page}
+  //           />
+  //         );
+  //       })}
+  //     </div>
+
+  //     <PaginationArrow
+  //       direction="right"
+  //       href={createPageURL(currentPage + 1)}
+  //       isDisabled={currentPage + 1 >= totalPage}
+  //     />
+  //   </div>
+  // );
 }
 
 function PaginationNumber({
