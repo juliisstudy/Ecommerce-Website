@@ -8,20 +8,17 @@ export default function Search({ placeholder }: { placeholder: string }) {
   const { replace } = useRouter();
   const pathname = usePathname();
 
-  const createQueryString = useDebouncedCallback(
-    (name: string, term: string) => {
-      const params = new URLSearchParams(searchParams);
-      // params.set("page", "1");
-      if (term) {
-        params.set(name, term);
-      } else {
-        params.delete(name);
-      }
-      replace(`${pathname}?${params.toString()}`);
-      console.log(params);
-    },
-    300
-  );
+  const handleSearch = useDebouncedCallback((term) => {
+    console.log(`search...${term}`);
+    const params = new URLSearchParams(searchParams);
+    //    params.set("page", "1");
+    if (term) {
+      params.set("query", term);
+    } else {
+      params.delete("query");
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }, 300);
 
   return (
     <div className="m-5">
@@ -33,9 +30,9 @@ export default function Search({ placeholder }: { placeholder: string }) {
         placeholder={placeholder}
         data-lpignore="true"
         onChange={(e) => {
-          createQueryString("filter", e.target.value);
+          handleSearch(e.target.value);
         }}
-        defaultValue={searchParams.get("filter")?.toString()}
+        defaultValue={searchParams.get("query")?.toString()}
       />
     </div>
   );

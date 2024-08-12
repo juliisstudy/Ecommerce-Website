@@ -16,7 +16,7 @@ export default function CartSidebar() {
   };
 
   return (
-    <div className="fixed top-0 right-0 w-32 h-full shadow-lg border-l overflow-scroll">
+    <div className="fixed top-0 right-0 w-32 h-full shadow-lg border-l overflow-scroll z-20">
       {loading ? (
         <div className="py-5 px-2">loading</div>
       ) : cartItems.length === 0 ? (

@@ -1,71 +1,58 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { hideLoading } from "@/redux/slices/cartSlice";
-import AddToCart from "./AddToCart";
 import PaginationComponent from "./Pagination";
-import Image from "next/image";
-import ProductRate from "@/app/component/ProductRate";
+import { ItemList } from "./ItemList";
+import { generateRange, sortdata } from "@/app/lib/utils";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useSearchParams } from "next/navigation";
 
 export default function Filter({ data }: { data: Product[] }) {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+
   const [products, setProducts] = useState<Product[]>(data);
   const [selectedCategories, setSelectedCategories] = useState<any>([]);
   const [selectedRanges, setSelectedRanges] = useState<any>([]);
-  const [dataPresent, setDataPresent] = useState<boolean>(false);
   const [dropdownSelected, setdropdownSelected] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [productPerPage] = useState(8);
+  const [dataPresent, setDataPresent] = useState<boolean>(false);
 
+  const productPerPageInit = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productPerPage] = useState(productPerPageInit);
+
+  //labels
   const options = [
     { value: "", lable: "Sort by" },
     { value: "priceMin-Max", lable: "priceMin-Max" },
     { value: "priceMax-Min", lable: "priceMax-Min" },
   ];
 
-  const getUniqueCatg = (data: Product[], field: string) => {
-    let newElement = data.map((curElement: any) => {
-      return curElement[field];
-    });
-    return (newElement = [...new Set(newElement)]);
-  };
+  const categoryType = [
+    "men's clothing",
+    "women's clothing",
+    "jewelery",
+    "electronics",
+  ];
 
-  const categoryType = getUniqueCatg(data, "category");
-
-  const generateRange = (min: number, max: number, interval: number) => {
-    let i = min;
-    let ranges = [];
-    while (i < max) {
-      let rangString = `${i}-`;
-      i += interval;
-      rangString += `${i - 1}`;
-      ranges.push(rangString);
-    }
-    return ranges;
-  };
-
-  const ranges = generateRange(0, 500, 50);
+  const ranges = generateRange(0, 300, 50);
 
   const handelCategorychange = (event: any) => {
     const category = event.target.value;
     if (event.target.checked) {
       setSelectedCategories([...selectedCategories, category]);
-      console.log(category);
     } else {
       setSelectedCategories(
         selectedCategories.filter((catg: any) => catg !== category)
       );
     }
   };
-
-  console.log(selectedCategories);
 
   const handleRangeChange = (event: any) => {
     const range = event.target.value;
@@ -75,60 +62,13 @@ export default function Filter({ data }: { data: Product[] }) {
       setSelectedRanges(selectedRanges.filter((r: any) => r !== range));
     }
   };
-  console.log(selectedRanges);
-
   function handleDropdown(event: any) {
     const selectValue = event.target.value;
     setdropdownSelected(selectValue);
     const temp = data;
-    if (selectValue === "priceMin-Max") {
-      temp.sort((a, b) => Number(a.price) - Number(b.price));
-      console.log("data ", data[0]);
-    }
-    if (selectValue === "priceMax-Min") {
-      temp.sort((a, b) => Number(b.price) - Number(a.price));
-    }
+    sortdata(temp, dropdownSelected);
     setProducts(temp);
   }
-
-  const sortdata = (data: Product[]) => {
-    let sorteddata;
-    if (dropdownSelected === "priceMin-Max") {
-      sorteddata = data.sort(
-        (a: any, b: any) => Number(a.price) - Number(b.price)
-      );
-    }
-    if (dropdownSelected === "priceMax-Min") {
-      sorteddata = data.sort(
-        (a: any, b: any) => Number(b.price) - Number(a.price)
-      );
-    }
-    return sorteddata;
-  };
-  const generateRangeArray = (min: number, max: number, interval: number) => {
-    let i = min;
-    let ranges = [];
-    while (i < max) {
-      let range = [];
-      range.push(i);
-      i += interval;
-      range.push(i - 1);
-      ranges.push(range);
-    }
-    return ranges;
-  };
-
-  const rangesNumber = generateRangeArray(0, 500, 50);
-
-  const checkIfInRange = (price: number) => {
-    let range = "";
-    rangesNumber.forEach((ranges) => {
-      if (price >= ranges[0] && price < ranges[1]) {
-        range = ranges.join("-");
-      }
-    });
-    return range;
-  };
 
   //pagination
   const indexOfLastProduct = currentPage * productPerPage;
@@ -144,15 +84,21 @@ export default function Filter({ data }: { data: Product[] }) {
 
   useEffect(() => {
     dispatch(hideLoading()), [dispatch];
-
+    //search filter
+    const search = searchParams.get("query") || "";
+    data = data.filter((product) => {
+      if (search) {
+        return (
+          product.title.toLowerCase().includes(search.toLowerCase()) ||
+          product.category.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+      return true;
+    });
+    //category and price filter
     const groupedData = data.reduce((acc: any, item: any) => {
       const category = item.category;
-      const price = item.price;
-      const range = checkIfInRange(price);
-      const propName = "range";
-      item[propName] = range;
-      const propNameStock = "countInstock";
-      item[propNameStock] = 10;
+      const range = item.range;
 
       if (!acc[category]) {
         acc[category] = {};
@@ -165,9 +111,9 @@ export default function Filter({ data }: { data: Product[] }) {
     }, {});
 
     if (selectedCategories.length === 0 && selectedRanges.length === 0) {
-      sortdata(data);
-
+      sortdata(data, dropdownSelected);
       setProducts(data);
+      setDataPresent(false);
     } else if (selectedCategories.length > 0) {
       const filteredData = selectedCategories.flatMap((category: any) => {
         if (groupedData[category]) {
@@ -185,19 +131,17 @@ export default function Filter({ data }: { data: Product[] }) {
           } else {
             return Object.values(groupedData[category])
               .flat()
-              .map((item: any) => ({ ...item, range: item.range })); //
+              .map((item: any) => ({ ...item, range: item.range }));
           }
         } else {
           return [];
         }
       });
-      //change pro
       if (filteredData.length === 0) {
         setProducts([]);
         setDataPresent(true);
       } else {
-        sortdata(filteredData);
-
+        sortdata(filteredData, dropdownSelected);
         setProducts(filteredData);
         setDataPresent(false);
       }
@@ -212,20 +156,22 @@ export default function Filter({ data }: { data: Product[] }) {
         setProducts([]);
         setDataPresent(true);
       } else {
-        sortdata(filteredData);
-
+        sortdata(filteredData, dropdownSelected);
         setProducts(filteredData);
         setDataPresent(false);
       }
     }
-  }, [selectedCategories, selectedRanges, dropdownSelected, dispatch]);
+  }, [
+    selectedCategories,
+    selectedRanges,
+    dropdownSelected,
+    dispatch,
+    searchParams,
+  ]);
 
   return (
     <div className="  flex flex-row">
-      {dataPresent && <div className="">no product is present</div>}
       <div className="w-2/12  mt-10 mr-10">
-        {/* checkbox */}
-
         {/* dropdown */}
         <Accordion type="single" collapsible>
           <AccordionItem value="item-2">
@@ -270,8 +216,6 @@ export default function Filter({ data }: { data: Product[] }) {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-
-        {/* checkbox */}
       </div>
       <div className="flex flex-col mr-20  w-10/12">
         <div>
@@ -290,6 +234,9 @@ export default function Filter({ data }: { data: Product[] }) {
             })}
           </select>
           <div className="mt-10">
+            {dataPresent && (
+              <div className="text-center">No product is present</div>
+            )}
             <ItemList products={currentProduct} />
           </div>
         </div>
@@ -303,51 +250,3 @@ export default function Filter({ data }: { data: Product[] }) {
     </div>
   );
 }
-
-const ItemList = ({ products }: { products: Product[] }) => {
-  return (
-    <div className="grid grid-cols-4 gap-6">
-      {products.map((product) => {
-        return <Item key={product.id} product={product} />;
-      })}
-    </div>
-  );
-};
-
-const Item = ({ product }: { product: Product }) => {
-  return (
-    <div className="border border-blue-50 relative">
-      <Link href={`/products/${product.id}`}>
-        <div className=" h-56 mx-auto mb-2">
-          <Image
-            src={product.image}
-            width={200}
-            height={200}
-            alt={product.title}
-            className=" w-48 h-56 mx-auto"
-          />
-        </div>
-        <div className="ml-4 mt-6">
-          <div className="text-slate-700 text-base leading-relaxed mb-2">
-            {product.title}
-          </div>
-          <ProductRate
-            rate={product.rating.rate}
-            count={product.rating.count}
-          />
-          <div className="text-slate-700 text-base leading-relaxed py-4 font-bold">
-            ${product.price}
-          </div>
-        </div>
-      </Link>
-      <div className="absolute bottom-3 right-4">
-        <AddToCart
-          showQty={false}
-          product={product}
-          increasePerClick={true}
-          redirect={false}
-        />
-      </div>
-    </div>
-  );
-};
