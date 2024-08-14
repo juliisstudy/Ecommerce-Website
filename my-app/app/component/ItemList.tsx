@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-
 import AddToCart from "./AddToCart";
 import Image from "next/image";
 import ProductRate from "@/app/component/ProductRate";

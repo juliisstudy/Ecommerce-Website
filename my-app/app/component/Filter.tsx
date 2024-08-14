@@ -170,7 +170,7 @@ export default function Filter({ data }: { data: Product[] }) {
   ]);
 
   return (
-    <div className="  flex flex-row">
+    <div className="  flex flex-row ">
       <div className="w-2/12  mt-10 mr-10">
         {/* dropdown */}
         <Accordion type="single" collapsible>
@@ -217,7 +217,7 @@ export default function Filter({ data }: { data: Product[] }) {
           </AccordionItem>
         </Accordion>
       </div>
-      <div className="flex flex-col mr-20  w-10/12">
+      <div className="flex flex-col mr-20  w-10/12 ">
         <div>
           <select
             className="float-right text-lg p-1 rounded-lg pl-3 bg-white border border-slate-200"

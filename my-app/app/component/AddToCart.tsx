@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { addToCart } from "@/redux/slices/cartSlice";
+import { Button } from "@/components/ui/button";
 
 type Params = {
   product: Product;
@@ -18,7 +19,7 @@ export default function AddToCart({
   increasePerClick = false,
 }: Params) {
   const dispatch = useDispatch();
-  const { cartItems } = useSelector((state: any) => state.cart);
+  const { cartItems, loading } = useSelector((state: any) => state.cart);
   const router = useRouter();
   const [qty, setQty] = useState(1);
 
@@ -40,7 +41,7 @@ export default function AddToCart({
   return (
     <>
       {product.countInstock > 0 && showQty && (
-        <div className="mb-2 flex justify-between">
+        <div className="mb-2 flex justify-between z-20">
           <div>QTY</div>
           <div>
             <select
@@ -58,9 +59,9 @@ export default function AddToCart({
       )}
       <div>
         {product.countInstock > 0 ? (
-          <button onClick={addToCartHandler}>add to cart</button>
+          <Button onClick={addToCartHandler}>add to cart</Button>
         ) : (
-          <button disabled>out of stock</button>
+          <Button disabled>out of stock</Button>
         )}
       </div>
     </>

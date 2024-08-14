@@ -39,11 +39,15 @@ export default function PaginationComponent({
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={prevPageHandler}
-              className={`${currentPage !== 1 ? "active" : ""}`}
-            />
+            {currentPage === 1 ? (
+              <></>
+            ) : (
+              <PaginationPrevious
+                href="#"
+                onClick={prevPageHandler}
+                className={`${currentPage !== 1 ? "active" : ""}`}
+              />
+            )}
           </PaginationItem>
 
           {pageNumber.map((number) => (
@@ -59,15 +63,19 @@ export default function PaginationComponent({
           ))}
 
           <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={nextPageHandler}
-              className={`${
-                currentPage !== pageNumber[pageNumber.length - 1]
-                  ? "active"
-                  : ""
-              }`}
-            />
+            {currentPage == pageNumber[pageNumber.length - 1] ? (
+              <></>
+            ) : (
+              <PaginationNext
+                href="#"
+                onClick={nextPageHandler}
+                className={`${
+                  currentPage !== pageNumber[pageNumber.length - 1]
+                    ? "active"
+                    : ""
+                }`}
+              />
+            )}
           </PaginationItem>
         </PaginationContent>
       </Pagination>

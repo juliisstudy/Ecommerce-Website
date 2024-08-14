@@ -71,10 +71,41 @@
 .dot {
   height: 20px;
   width: 20px;
-  background-color: #bbb;
+  background-color: #fcba4d;
   border-radius: 50%;
   display: inline-block;
   position: absolute;
   top: 40px;
   padding-left: 5px;
+}
+
+.delte {
+  color: gray;
+}
+.delte :active {
+  color: black;
+}
+.goShoppingbtn {
+  background-color: #fcba4d;
+}
+
+table thead {
+  letter-spacing: 0.1rem;
+}
+form label {
+  color: #898989;
+  @apply font-extralight text-xl leading-loose;
+}
+
+form table tr {
+  letter-spacing: 0.05rem;
+  height: 3.5rem;
+}
+
+.shipping p {
+  @apply text-slate-800;
+}
+
+.shipping input {
+  @apply ml-10 border border-slate-200 rounded-sm pl-5 text-xl h-12;
 }

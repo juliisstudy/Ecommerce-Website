@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { saveShippingAddress } from "@/redux/slices/cartSlice";
 import CheckoutWizard from "../component/CheckoutWizard";
+import { Button } from "@/components/ui/button";
 
 type FormValues = {
   fullName: string;
@@ -19,7 +20,12 @@ export default function ShippingAddresspage() {
     register,
     formState: { errors },
     setValue,
-  } = useForm<FormValues>();
+  } = useForm<FormValues>({
+    mode: "onBlur",
+    reValidateMode: "onBlur",
+    criteriaMode: "all",
+  });
+
   const router = useRouter();
   const dispatch = useDispatch();
   const { shippingAddress } = useSelector((state: any) => state.cart);
@@ -45,96 +51,143 @@ export default function ShippingAddresspage() {
     router.push("/payment");
   };
   return (
-    <div>
-      <CheckoutWizard activeStep={1} />
-      <form onSubmit={handleSubmit(submitHandler)}>
-        <div>
-          <label htmlFor="fullName">fullName</label>
-          <input
-            className=""
-            id="fullName"
-            autoFocus
-            {...register("fullName", {
-              required: "please enter full name",
-              minLength: {
-                value: 3,
-                message: "address is more than 2 chars",
-              },
-            })}
-          />
-          {errors.fullName && <div className="">{errors.fullName.message}</div>}
-        </div>
-        <div>
-          <label htmlFor="address">fullName</label>
-          <input
-            className=""
-            id="address"
-            autoFocus
-            {...register("address", {
-              required: "please enter address",
-              minLength: {
-                value: 3,
-                message: "address is more than 5 chars",
-              },
-            })}
-          />
-          {errors.address && <div className="">{errors.address.message}</div>}
-        </div>
-        <div>
-          <label htmlFor="city">city</label>
-          <input
-            className=""
-            id="city"
-            autoFocus
-            {...register("city", {
-              required: "please enter city",
-              minLength: {
-                value: 3,
-                message: "city is more than 5 chars",
-              },
-            })}
-          />
-          {errors.city && <div className="">{errors.city.message}</div>}
-        </div>
-        <div>
-          <label htmlFor="postalCode">city</label>
-          <input
-            className=""
-            id="postalCode"
-            autoFocus
-            {...register("postalCode", {
-              required: "please enter postalCode",
-              minLength: {
-                value: 3,
-                message: "postalCode is more than 5 chars",
-              },
-            })}
-          />
-          {errors.postalCode && (
-            <div className="">{errors.postalCode.message}</div>
-          )}
-        </div>
-        <div>
-          <label htmlFor="country">country</label>
-          <input
-            className=""
-            id="country"
-            autoFocus
-            {...register("country", {
-              required: "please enter country",
-              minLength: {
-                value: 3,
-                message: "country is more than 5 chars",
-              },
-            })}
-          />
-          {errors.country && <div className="">{errors.country.message}</div>}
-        </div>
-        <div>
-          <button onClick={() => router.push("/payment")}>
-            Process to checkout
-          </button>
-        </div>
+    <div className="mx-20 pt-40 h-screen">
+      <CheckoutWizard activeStep={0} />
+      <form
+        onSubmit={handleSubmit(submitHandler)}
+        className="mx-auto w-4/5 mt-20"
+      >
+        <table className="shipping mx-auto">
+          <tbody>
+            <tr>
+              <td className="">
+                <label htmlFor="fullName">Full Name</label>
+              </td>
+              <td className=" w-20 pr-5">
+                <input
+                  className="ml-10 border border-slate-200 rounded-sm pl-5 text-xl h-12"
+                  id="fullName"
+                  autoFocus
+                  {...register("fullName", {
+                    required: "Please enter your full name",
+                    minLength: {
+                      value: 3,
+                      message: "Full Name should more than 5 characters",
+                    },
+                  })}
+                />
+              </td>
+              <td>
+                {errors.fullName && (
+                  <p className="">{errors.fullName.message}</p>
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label htmlFor="address">Address</label>
+              </td>
+              <td>
+                <input
+                  className=""
+                  id="address"
+                  autoFocus
+                  {...register("address", {
+                    required: "Please enter your address",
+                    minLength: {
+                      value: 3,
+                      message: "Address should more than 5 characters",
+                    },
+                  })}
+                />
+              </td>
+              <td>
+                {errors.address && (
+                  <span className="">{errors.address.message}</span>
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label htmlFor="city">City</label>
+              </td>
+              <td>
+                <input
+                  className=""
+                  id="city"
+                  autoFocus
+                  {...register("city", {
+                    required: "Please enter your city",
+                    minLength: {
+                      value: 3,
+                      message: "City is more than 5 characters",
+                    },
+                  })}
+                />
+              </td>
+              <td>
+                {errors.city && <span className="">{errors.city.message}</span>}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label htmlFor="postalCode">ZIP Code</label>
+              </td>
+              <td>
+                <input
+                  className=""
+                  id="postalCode"
+                  autoFocus
+                  {...register("postalCode", {
+                    required: "Please enter ZIP Code",
+                    minLength: {
+                      value: 6,
+                      message: "ZIP Code should 6 digits",
+                    },
+                  })}
+                />
+              </td>
+              <td>
+                {errors.postalCode && (
+                  <span className="">{errors.postalCode.message}</span>
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label htmlFor="country">Country</label>
+              </td>
+              <td>
+                <input
+                  className=""
+                  id="country"
+                  autoFocus
+                  {...register("country", {
+                    required: "please enter your country",
+                    minLength: {
+                      value: 3,
+                      message: "Country should more than 5 characters",
+                    },
+                  })}
+                />
+              </td>
+              <td>
+                {errors.country && (
+                  <span className="">{errors.country.message}</span>
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+
+              <td className="mt-20 float-right mr-6">
+                <Button onClick={() => router.push("/payment")}>
+                  Process to checkout
+                </Button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </form>
     </div>
   );

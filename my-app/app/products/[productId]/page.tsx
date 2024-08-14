@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import { getProduct } from "@/app/lib/getData";
 import type { Metadata } from "next";
-import ProductDetail from "../component/ProductDetail";
+import ProductDetail from "@/app/component/ProductDetail";
+import BreadcrumbNav from "@/app/component/Breadcrumb";
 type Params = {
   params: {
     productId: number;
@@ -22,8 +23,8 @@ export default async function ProductPage({ params: { productId } }: Params) {
   const productData: Promise<Product> = getProduct(productId);
   const productDetail = await productData;
   return (
-    <div className="mx-20 pt-32">
-      <h1>{productDetail.title}</h1>
+    <div className="mx-20 pt-32 h-screen">
+      <BreadcrumbNav product={productDetail} />
       <Suspense fallback={<h1>loading</h1>}>
         <ProductDetail product={productDetail} />
       </Suspense>
