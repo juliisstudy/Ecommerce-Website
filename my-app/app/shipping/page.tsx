@@ -51,7 +51,7 @@ export default function ShippingAddresspage() {
     router.push("/payment");
   };
   return (
-    <div className="mx-20 pt-40 h-screen">
+    <div className="md:mx-20 pt-40 h-screen">
       <CheckoutWizard activeStep={0} />
       <form
         onSubmit={handleSubmit(submitHandler)}

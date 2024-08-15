@@ -11,7 +11,7 @@ export default async function page() {
   let products = await dataFormat();
 
   return (
-    <div className="mx-20 pt-32 mb-10 min-h-screen ">
+    <div className="ml-2 md:mx-20 pt-32 mb-10 min-h-screen ">
       <Filter data={products} />
     </div>
   );

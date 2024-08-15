@@ -10,7 +10,7 @@ export default function ProductRate({
   count: number;
 }) {
   return (
-    <div className="flex">
+    <div className="md:flex">
       <Rating style={{ maxWidth: 100 }} value={rate} readOnly />
       {count} reviews
     </div>

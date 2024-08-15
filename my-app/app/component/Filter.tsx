@@ -170,10 +170,10 @@ export default function Filter({ data }: { data: Product[] }) {
   ]);
 
   return (
-    <div className="  flex flex-row ">
-      <div className="w-2/12  mt-10 mr-10">
+    <div className=" md:flex md:flex-row ">
+      <div className=" w-4/5 flex flex-row md:w-2/12 md:mt-10 md:mr-10 md:flex-col ">
         {/* dropdown */}
-        <Accordion type="single" collapsible>
+        <Accordion type="single" collapsible className="ml-5">
           <AccordionItem value="item-2">
             <AccordionTrigger>Category</AccordionTrigger>
             <AccordionContent>
@@ -194,7 +194,9 @@ export default function Filter({ data }: { data: Product[] }) {
               </ul>
             </AccordionContent>
           </AccordionItem>
+        </Accordion>
 
+        <Accordion type="single" collapsible className="ml-5">
           <AccordionItem value="item-1">
             <AccordionTrigger>Price Range</AccordionTrigger>
             <AccordionContent>
@@ -217,10 +219,10 @@ export default function Filter({ data }: { data: Product[] }) {
           </AccordionItem>
         </Accordion>
       </div>
-      <div className="flex flex-col mr-20  w-10/12 ">
+      <div className=" md:flex flex-col md:mr-20 w-10/12 ">
         <div>
           <select
-            className="float-right text-lg p-1 rounded-lg pl-3 bg-white border border-slate-200"
+            className="pt-4 ml-5 border-none md:float-right text-lg md:p-1 md:rounded-lg md:pl-3 bg-white md:border md:border-slate-200"
             value={dropdownSelected}
             onChange={handleDropdown}
             defaultValue={""}
@@ -233,13 +235,19 @@ export default function Filter({ data }: { data: Product[] }) {
               );
             })}
           </select>
-          <div className="mt-10">
+          <div className=" mt-10">
             {dataPresent && (
               <div className="text-center">No product is present</div>
             )}
             <ItemList products={currentProduct} />
           </div>
         </div>
+        {/* <div className="mt-10 md:hidden">
+          {dataPresent && (
+            <div className="text-center">No product is present</div>
+          )}
+          <ItemList products={currentProduct} />
+        </div> */}
         <PaginationComponent
           productsPerPage={productPerPage}
           totalProducts={products.length}

@@ -24,20 +24,11 @@ export default function Paymentpage() {
   } = useSelector((state: any) => state.cart);
   const router = useRouter();
 
-  //    loading: true,
-  //   cartItems: [],
-  //   itemsPrice: 0,
-  //   shippingPrice: 0,
-  //   taxRate: 0.07,
-  //   taxPrice: 0,
-  //   totalPrice: 0,
-  //   shippingAddress: {},
-  //   paymentMethod: "",
   return (
-    <div className="mx-20 pt-40 h-screen">
+    <div className="md:mx-20 pt-40 min-h-screen">
       <CheckoutWizard activeStep={3} />
-      <div className="w-3/5 mx-auto ">
-        <div className="">
+      <div className="w-3/5 mx-auto min-h-max">
+        <div className="flex flex-col gap-2">
           <table className="w-full text-center text-slate-600">
             <thead>
               <tr>
@@ -72,42 +63,65 @@ export default function Paymentpage() {
             </tbody>
           </table>
 
-          <table className="mt-12 float-right mr-32">
+          <table className="mt-12 float-right mr-32 mb-20 md:ml-24">
             <tbody>
-              <tr>
+              <tr className="border-b md:border-none">
                 <td className="font-semibold text-lg mt-10 ml-4">
                   Total Products Price
                 </td>
                 <td className="pl-10">$ {itemsPrice}</td>
               </tr>
-              <tr>
+              <tr className="border-b md:border-none">
                 <td className="font-semibold text-lg mt-10 ml-4">
                   Shipping Price
                 </td>
                 <td className="pl-10">$ {shippingPrice}</td>
               </tr>
 
-              <tr>
+              <tr className="border-b md:border-none">
                 <td className="font-semibold text-lg mt-10 ml-4">Tax Price</td>
                 <td className="pl-10">$ {taxPrice}</td>
               </tr>
-              <tr>
+              <tr className="border-b md:border-none">
                 <td className="font-semibold text-lg mt-10 ml-4">
                   Total Price
                 </td>
                 <td className="pl-10">$ {totalPrice}</td>
               </tr>
-              <tr>
+              <tr className="border-b md:border-none">
                 <td className="font-semibold text-lg mt-10 ml-4">
                   Payment Method
                 </td>
-                <td className="pl-10">{paymentMethod}</td>
+                <td className="pl-10">
+                  {paymentMethod}
+                  <Link
+                    className="ml-5 text-sky-600 hover:text-sky-300"
+                    href="/payment"
+                  >
+                    Edit
+                  </Link>
+                </td>
+              </tr>
+              <tr className="border-b md:border-none">
+                <td className="font-semibold text-lg mt-10 ml-4">
+                  Shipping Address
+                </td>
+                <td className="pl-10">
+                  {shippingAddress.fullName},{shippingAddress.address},
+                  {shippingAddress.city}
+                  <Link
+                    className="ml-5 text-sky-600 hover:text-sky-300"
+                    href="/shipping"
+                  >
+                    Edit
+                  </Link>
+                </td>
               </tr>
               <tr>
                 <td colSpan={2}>
                   <Button
-                    className="font-bold mt-5 float-right"
-                    onClick={() => router.push("/shipping")}
+                    className="font-bold mt-10 float-right"
+                    onClick={() => router.push("/thankyou")}
                   >
                     Process to checkout
                   </Button>

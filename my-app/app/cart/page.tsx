@@ -21,7 +21,8 @@ export default function Cartpage() {
     dispatch(addToCart({ ...product, qty }));
   };
   return (
-    <div className="mx-20 pt-40 h-screen">
+    <div className="md:mx-20 pt-40 h-screen">
+      <h1 className="text-slate-600 text-xl ml-5 md:ml-20">Shopping Cart</h1>
       {loading ? (
         <div>loading</div>
       ) : cartItems.length === 0 ? (
@@ -33,9 +34,9 @@ export default function Cartpage() {
           </Link>
         </div>
       ) : (
-        <div className="w-3/5 mx-auto ">
+        <div className="w-4/5 mt-10  md:w-3/5 mx-auto ">
           <div className="">
-            <table className="w-full text-center ">
+            <table className="md:w-full text-center ">
               <thead>
                 <tr>
                   <th className="p-5">Product</th>

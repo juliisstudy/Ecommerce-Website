@@ -6,7 +6,7 @@ import ProductRate from "@/app/component/ProductRate";
 
 export const ItemList = ({ products }: { products: Product[] }) => {
   return (
-    <div className="grid grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-6">
       {products.map((product) => {
         return <Item key={product.id} product={product} />;
       })}
@@ -40,7 +40,7 @@ export const Item = ({ product }: { product: Product }) => {
           </div>
         </div>
       </Link>
-      <div className="absolute bottom-3 right-4">
+      <div className="ml-12 mb-10 md:absolute bottom-1 right-4 md:mb-2">
         <AddToCart
           showQty={false}
           product={product}

@@ -109,3 +109,6 @@ form table tr {
 .shipping input {
   @apply ml-10 border border-slate-200 rounded-sm pl-5 text-xl h-12;
 }
+.shoppingcart :hover {
+  color: gray;
+}

@@ -24,7 +24,7 @@ export default function CartSidebar() {
   return (
     <div
       className={`fixed top-0 right-0 h-full shadow-lg border-l overflow-hidden z-50 bg-white 
-    ${expand ? "w-56" : "w-20"}`}
+    ${expand ? "w-56" : "w-10 md:w-20"}`}
     >
       {loading ? (
         <div className="">loading</div>
@@ -35,9 +35,9 @@ export default function CartSidebar() {
               className="relative"
               onClick={() => setExpand((curr) => !curr)}
             >
-              <FaCartShopping className="w-8 h-8 m-5 " />
+              <FaCartShopping className="w-8 h-8 m-2 md:m-5 shoppingcart" />
             </button>
-            <span className="absolute dot z-10 left-9 font-bold ">
+            <span className="absolute dot z-10 left-4 md:left-9 font-bold ">
               <p className="-mt-0.5">{cartNum}</p>
             </span>
           </div>
@@ -64,7 +64,7 @@ export default function CartSidebar() {
               </Link>
               <div className="flex flex-row mt-2">
                 <select
-                  className=""
+                  className="bg-white text-lg border border-slate-200 p-1 rounded-md"
                   value={item.qty}
                   onChange={(e) =>
                     addToCartHandler(item, Number(e.target.value))
@@ -77,7 +77,7 @@ export default function CartSidebar() {
                   ))}
                 </select>
                 <MdDelete
-                  className="w-6 h-6 delte ml-4"
+                  className="w-6 h-6 delte ml-4 m-1"
                   onClick={() => remvoeFromCartHandler(item.id)}
                 />
               </div>
