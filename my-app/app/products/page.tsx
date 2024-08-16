@@ -1,8 +1,7 @@
-import React from "react";
-import { getProductsList, dataFormat } from "../lib/getData";
+import React, { Suspense } from "react";
+import { dataFormat } from "../lib/getData";
 import { Metadata } from "next";
 import Filter from "../component/Filter";
-import { ItemList } from "@/app/component/ItemList";
 export const metadata: Metadata = {
   title: "products",
 };
@@ -12,7 +11,9 @@ export default async function page() {
 
   return (
     <div className="ml-2 md:mx-20 pt-32 mb-10 min-h-screen ">
-      <Filter data={products} />
+      <Suspense fallback={<div>Loading</div>}>
+        <Filter data={products} />
+      </Suspense>
     </div>
   );
 }

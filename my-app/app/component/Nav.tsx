@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense } from "react";
 import Search from "./Search";
 import Link from "next/link";
 export default function Nav() {
@@ -9,7 +9,9 @@ export default function Nav() {
         <Link href="/products"> SHOP</Link>
       </div>
       <div className="w-3/5 md:ml-48">
-        <Search placeholder="Search products..." />
+        <Suspense fallback={<div>loading</div>}>
+          <Search placeholder="Search products..." />
+        </Suspense>
       </div>
     </div>
   );
