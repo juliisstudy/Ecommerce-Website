@@ -1,60 +1,58 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { hideLoading } from "@/redux/slices/cartSlice";
-import AddToCart from "./AddToCart";
+import PaginationComponent from "./Pagination";
+import { ItemList } from "./ItemList";
+import { generateRange, sortdata } from "@/app/lib/utils";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useSearchParams } from "next/navigation";
 
 export default function Filter({ data }: { data: Product[] }) {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+
   const [products, setProducts] = useState<Product[]>(data);
   const [selectedCategories, setSelectedCategories] = useState<any>([]);
   const [selectedRanges, setSelectedRanges] = useState<any>([]);
-  const [dataPresent, setDataPresent] = useState<boolean>(false);
   const [dropdownSelected, setdropdownSelected] = useState<string>("");
+  const [dataPresent, setDataPresent] = useState<boolean>(false);
 
+  const productPerPageInit = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productPerPage] = useState(productPerPageInit);
+
+  //labels
   const options = [
-    { value: "", lable: "select sorting method" },
+    { value: "", lable: "Sort by" },
     { value: "priceMin-Max", lable: "priceMin-Max" },
     { value: "priceMax-Min", lable: "priceMax-Min" },
   ];
 
-  const getUniqueCatg = (data: Product[], field: string) => {
-    let newElement = data.map((curElement: any) => {
-      return curElement[field];
-    });
-    return (newElement = [...new Set(newElement)]);
-  };
+  const categoryType = [
+    "men's clothing",
+    "women's clothing",
+    "jewelery",
+    "electronics",
+  ];
 
-  const categoryType = getUniqueCatg(data, "category");
-
-  const generateRange = (min: number, max: number, interval: number) => {
-    let i = min;
-    let ranges = [];
-    while (i < max) {
-      let rangString = `${i}-`;
-      i += interval;
-      rangString += `${i - 1}`;
-      ranges.push(rangString);
-    }
-    return ranges;
-  };
-
-  const ranges = generateRange(0, 500, 50);
+  const ranges = generateRange(0, 300, 50);
 
   const handelCategorychange = (event: any) => {
     const category = event.target.value;
     if (event.target.checked) {
       setSelectedCategories([...selectedCategories, category]);
-      console.log(category);
     } else {
       setSelectedCategories(
         selectedCategories.filter((catg: any) => catg !== category)
       );
     }
   };
-
-  console.log(selectedCategories);
 
   const handleRangeChange = (event: any) => {
     const range = event.target.value;
@@ -64,72 +62,43 @@ export default function Filter({ data }: { data: Product[] }) {
       setSelectedRanges(selectedRanges.filter((r: any) => r !== range));
     }
   };
-  console.log(selectedRanges);
-
   function handleDropdown(event: any) {
     const selectValue = event.target.value;
     setdropdownSelected(selectValue);
     const temp = data;
-    if (selectValue === "priceMin-Max") {
-      temp.sort((a, b) => Number(a.price) - Number(b.price));
-      console.log("data ", data[0]);
-    }
-    if (selectValue === "priceMax-Min") {
-      temp.sort((a, b) => Number(b.price) - Number(a.price));
-    }
+    sortdata(temp, dropdownSelected);
     setProducts(temp);
   }
 
-  const sortdata = (data: Product[]) => {
-    let sorteddata;
-    if (dropdownSelected === "priceMin-Max") {
-      sorteddata = data.sort(
-        (a: any, b: any) => Number(a.price) - Number(b.price)
-      );
-    }
-    if (dropdownSelected === "priceMax-Min") {
-      sorteddata = data.sort(
-        (a: any, b: any) => Number(b.price) - Number(a.price)
-      );
-    }
-    return sorteddata;
-  };
-  const generateRangeArray = (min: number, max: number, interval: number) => {
-    let i = min;
-    let ranges = [];
-    while (i < max) {
-      let range = [];
-      range.push(i);
-      i += interval;
-      range.push(i - 1);
-      ranges.push(range);
-    }
-    return ranges;
-  };
+  //pagination
+  const indexOfLastProduct = currentPage * productPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productPerPage;
+  const currentProduct = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
 
-  const rangesNumber = generateRangeArray(0, 500, 50);
-
-  const checkIfInRange = (price: number) => {
-    let range = "";
-    rangesNumber.forEach((ranges) => {
-      if (price >= ranges[0] && price < ranges[1]) {
-        range = ranges.join("-");
-      }
-    });
-    return range;
-  };
+  function paginate(pageNumber: number) {
+    setCurrentPage(pageNumber);
+  }
 
   useEffect(() => {
     dispatch(hideLoading()), [dispatch];
-
+    //search filter
+    const search = searchParams.get("query") || "";
+    data = data.filter((product) => {
+      if (search) {
+        return (
+          product.title.toLowerCase().includes(search.toLowerCase()) ||
+          product.category.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+      return true;
+    });
+    //category and price filter
     const groupedData = data.reduce((acc: any, item: any) => {
       const category = item.category;
-      const price = item.price;
-      const range = checkIfInRange(price);
-      const propName = "range";
-      item[propName] = range;
-      const propNameStock = "countInstock";
-      item[propNameStock] = 10;
+      const range = item.range;
 
       if (!acc[category]) {
         acc[category] = {};
@@ -142,9 +111,9 @@ export default function Filter({ data }: { data: Product[] }) {
     }, {});
 
     if (selectedCategories.length === 0 && selectedRanges.length === 0) {
-      sortdata(data);
-
+      sortdata(data, dropdownSelected);
       setProducts(data);
+      setDataPresent(false);
     } else if (selectedCategories.length > 0) {
       const filteredData = selectedCategories.flatMap((category: any) => {
         if (groupedData[category]) {
@@ -162,19 +131,17 @@ export default function Filter({ data }: { data: Product[] }) {
           } else {
             return Object.values(groupedData[category])
               .flat()
-              .map((item: any) => ({ ...item, range: item.range })); //
+              .map((item: any) => ({ ...item, range: item.range }));
           }
         } else {
           return [];
         }
       });
-      //change pro
       if (filteredData.length === 0) {
         setProducts([]);
         setDataPresent(true);
       } else {
-        sortdata(filteredData);
-
+        sortdata(filteredData, dropdownSelected);
         setProducts(filteredData);
         setDataPresent(false);
       }
@@ -189,103 +156,105 @@ export default function Filter({ data }: { data: Product[] }) {
         setProducts([]);
         setDataPresent(true);
       } else {
-        sortdata(filteredData);
-
+        sortdata(filteredData, dropdownSelected);
         setProducts(filteredData);
         setDataPresent(false);
       }
     }
-  }, [selectedCategories, selectedRanges, dropdownSelected, dispatch]);
+  }, [
+    selectedCategories,
+    selectedRanges,
+    dropdownSelected,
+    dispatch,
+    searchParams,
+  ]);
 
   return (
-    <div>
-      {dataPresent && <div className="">no product is present</div>}
+    <div className=" md:flex md:flex-row ">
+      <div className=" w-4/5 flex flex-row md:w-2/12 md:mt-10 md:mr-10 md:flex-col ">
+        {/* dropdown */}
+        <Accordion type="single" collapsible className="ml-5">
+          <AccordionItem value="item-2">
+            <AccordionTrigger>Category</AccordionTrigger>
+            <AccordionContent>
+              <ul>
+                {categoryType.map((item, idx) => (
+                  <li key={idx} className="flex flex-row gap-4 p-3 text-lg">
+                    <div>
+                      <input
+                        type="checkbox"
+                        value={item}
+                        checked={selectedCategories.includes(item)}
+                        onChange={handelCategorychange}
+                      />
+                    </div>
+                    <div>{item}</div>
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
-      {/* dropdown */}
-
-      <select
-        value={dropdownSelected}
-        onChange={handleDropdown}
-        defaultValue={""}
-      >
-        {options.map((option) => {
-          return (
-            <option key={option.value} value={option.value}>
-              {option.lable}
-            </option>
-          );
-        })}
-      </select>
-
-      {/* checkbox */}
-      <ul>
-        {categoryType.map((item, idx) => (
-          <li key={idx}>
-            <div>
-              <input
-                type="checkbox"
-                value={item}
-                checked={selectedCategories.includes(item)}
-                onChange={handelCategorychange}
-              />
-            </div>
-            <div>{item}</div>
-          </li>
-        ))}
-      </ul>
-      <ul>
-        {ranges.map((item, idx) => (
-          <li key={idx}>
-            <div>
-              <input
-                type="checkbox"
-                value={item}
-                checked={selectedRanges.includes(item)}
-                onChange={handleRangeChange}
-              />
-            </div>
-            <div>{item}</div>
-          </li>
-        ))}
-      </ul>
-      <div>
-        <ItemList products={products} />
+        <Accordion type="single" collapsible className="ml-5">
+          <AccordionItem value="item-1">
+            <AccordionTrigger>Price Range</AccordionTrigger>
+            <AccordionContent>
+              <ul>
+                {ranges.map((item, idx) => (
+                  <li key={idx} className="flex flex-row gap-4 p-3 text-lg">
+                    <div>
+                      <input
+                        type="checkbox"
+                        value={item}
+                        checked={selectedRanges.includes(item)}
+                        onChange={handleRangeChange}
+                      />
+                    </div>
+                    <div>{item}</div>
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+      <div className=" md:flex flex-col md:mr-20 w-10/12 ">
+        <div>
+          <select
+            className="pt-4 ml-5 border-none md:float-right text-lg md:p-1 md:rounded-lg md:pl-3 bg-white md:border md:border-slate-200"
+            value={dropdownSelected}
+            onChange={handleDropdown}
+            defaultValue={""}
+          >
+            {options.map((option) => {
+              return (
+                <option key={option.value} value={option.value}>
+                  {option.lable}
+                </option>
+              );
+            })}
+          </select>
+          <div className=" mt-10">
+            {dataPresent && (
+              <div className="text-center">No product is present</div>
+            )}
+            <ItemList products={currentProduct} />
+          </div>
+        </div>
+        {/* <div className="mt-10 md:hidden">
+          {dataPresent && (
+            <div className="text-center">No product is present</div>
+          )}
+          <ItemList products={currentProduct} />
+        </div> */}
+        <PaginationComponent
+          productsPerPage={productPerPage}
+          totalProducts={products.length}
+          paginate={paginate}
+          currentPage={currentPage}
+        />
       </div>
     </div>
   );
 }
-
-const ItemList = ({ products }: { products: Product[] }) => {
-  return (
-    <div className="grid grid-cols-4 gap-6">
-      {products.map((product) => {
-        return <Item key={product.id} product={product} />;
-      })}
-    </div>
-  );
-};
-
-const Item = ({ product }: { product: Product }) => {
-  function addtoCart(event: any) {
-    console.log("'addtocart");
-  }
-
-  return (
-    <div className="border border-blue-50">
-      <Link href={`/products/${product.id}`}>
-        <div>{product.image}</div>
-        <div>{product.title}</div>
-        <div>{product.price}</div>
-        <div>{product.category}</div>
-        <div>{product.rating.rate}</div>
-        <div>{product.rating.count}</div>
-      </Link>
-      <AddToCart
-        showQty={false}
-        product={product}
-        increasePerClick={true}
-        redirect={false}
-      />
-    </div>
-  );
-};

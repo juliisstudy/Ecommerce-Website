@@ -8,34 +8,31 @@ export default function Search({ placeholder }: { placeholder: string }) {
   const { replace } = useRouter();
   const pathname = usePathname();
 
-  const createQueryString = useDebouncedCallback(
-    (name: string, term: string) => {
-      const params = new URLSearchParams(searchParams);
-      params.set("page", "1");
-      if (term) {
-        params.set(name, term);
-      } else {
-        params.delete(name);
-      }
-      replace(`${pathname}?${params.toString()}`);
-      console.log(params);
-    },
-    300
-  );
+  const handleSearch = useDebouncedCallback((term) => {
+    console.log(`search...${term}`);
+    const params = new URLSearchParams(searchParams);
+    //    params.set("page", "1");
+    if (term) {
+      params.set("query", term);
+    } else {
+      params.delete("query");
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }, 300);
 
   return (
-    <div className="relative flex flex-1 flex-shrink-0">
+    <div className="m-5">
       <label htmlFor="search" className="sr-only">
         Search
       </label>
       <input
-        className="p-4 py-6 border border-blue-200"
+        className=" border border-slate-200 h-10 w-full rounded-lg pl-5"
         placeholder={placeholder}
         data-lpignore="true"
         onChange={(e) => {
-          createQueryString("filter", e.target.value);
+          handleSearch(e.target.value);
         }}
-        defaultValue={searchParams.get("filter")?.toString()}
+        defaultValue={searchParams.get("query")?.toString()}
       />
     </div>
   );
