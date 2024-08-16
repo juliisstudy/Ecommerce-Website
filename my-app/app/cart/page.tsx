@@ -22,7 +22,6 @@ export default function Cartpage() {
   };
   return (
     <div className="md:mx-20 pt-40 h-screen">
-      <h1 className="text-slate-600 text-xl ml-5 md:ml-20">Shopping Cart</h1>
       {loading ? (
         <div>loading</div>
       ) : cartItems.length === 0 ? (
