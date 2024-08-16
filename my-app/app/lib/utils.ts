@@ -41,8 +41,6 @@ export const checkIfInRange = (price: number) => {
   return range;
 };
 
-
-
  export const sortdata = (data: Product[],dropdownSelected:string) => {
     let sorteddata;
     if (dropdownSelected === "priceMin-Max") {

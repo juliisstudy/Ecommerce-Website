@@ -47,7 +47,7 @@ export default function Cartpage() {
                 {cartItems.map((item: Product) => (
                   <tr key={item.id}>
                     <td className="w-1/5">
-                      <Link href={`/product/${item.id}`} className="px-5 pl-5">
+                      <Link href={`/products/${item.id}`} className="px-5 pl-5">
                         <Image
                           src={item.image}
                           width={80}

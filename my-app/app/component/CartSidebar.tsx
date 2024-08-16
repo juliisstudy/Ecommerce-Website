@@ -54,7 +54,7 @@ export default function CartSidebar() {
           </div>
           {cartItems.map((item: Product) => (
             <div key={item.id} className="p-2 flex flex-col items-center">
-              <Link href={`/product/${item.id}`} className="flex items-center">
+              <Link href={`/products/${item.id}`} className="flex items-center">
                 <Image
                   src={item.image}
                   width={50}
