@@ -11,3 +11,11 @@ Responsive E-shopping website <br/><br/>
 * Product Sorting
 * Shopping Cart
 * Checkout Process
+<br/><br/>
+## Built With
+
+- [NextJS]
+- [React]
+- [Redux]
+- [Tailwindcss]
+- [Fakestoreapi]
